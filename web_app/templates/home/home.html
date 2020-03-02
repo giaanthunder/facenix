@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+{% load static %}
+<html>
+<head>
+   <meta charset="utf-8">
+   <title>Facenix</title>
+   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+   <link rel="stylesheet" type="text/css" href="{% static 'css/mystyle.css' %}">
+   <link href="{% static 'images/flame-icon.png' %}" rel="shortcut icon" type="image/x-icon">
+</head>
+<body>
+
+   <div class="container text-white">
+      <div class="jumbotron jumbotron-fluid" style="background: rgba(25, 25, 25, .4)">
+         <div class="container text-white">
+         <h1 class="display-4" style="font-family:'SVN-Very Berry'; left:30px;">Welcome to Facenix!</h1>
+         <p class="lead" style="opacity:1">This is Facenix - A powerful image processing tool for face attributes manipulation.</p>
+         </div>
+      </div>
+
+      <h3>Please choose 1 in 2 methods below:</h3>
+      <div class="rcorner">
+         <h1 class="hana_h1">Simple modification</h1>
+         <p class="hana_p">- Add or remove face attribute</p>
+         <p class="hana_p">- Fast initialization</p>
+         <a href="./app1" class="try_now">Try now</a>
+      </div>
+      <p></p>
+      <div class="rcorner">
+         <h1 class="hana_h1">Flexible modification</h1>
+         <p class="hana_p">- Face image modification with attribute indensity control</p>
+         <p class="hana_p">- Different attributes</p>
+         <p class="hana_p">- Cost more time on initialization</p>
+         <a href="./app2" class="try_now">Try now</a>
+      </div>
+   </div>
+</body>
+</html>
+

@@ -1,0 +1,91 @@
+body{
+   background:url('https://assets.website-files.com/583024ce4cc99c6e545f8dab/5830256b4cc99c6e545f8f4c_background.jpg') 
+   no-repeat center center fixed;
+   -webkit-background-size: cover;
+   -moz-background-size: cover;
+   -o-background-size: cover;
+   background-size: cover;
+}
+@font-face {
+  font-family: 'SVN-Very Berry';
+  src: url('../fonts/SVN-Very Berry.ttf');
+  font-weight: bold;
+}
+@font-face {
+  font-family: 'RobotoCondensed';
+  src: url('../fonts/RobotoCondensed-Regular.ttf');
+}
+.hana_h1{
+   box-sizing: border-box;
+   margin: .67em 0;
+   margin-bottom: 10px;
+   font-family: 'SVN-Very Berry',sans-serif;
+   color: #fff;
+   margin-left: 0;
+   line-height: 40px;
+   font-weight: 400;
+   text-align: left;
+   letter-spacing: 2px;
+   font-size: 30px;
+   margin-top: 0;
+   opacity: 1;
+}
+.hana_p{
+   font-family: sans-serif;
+   box-sizing: border-box;
+   margin-bottom: 10px;
+   color: #fff;
+   text-align: left;
+}
+
+
+.rcorner {
+   border-radius: 10px;
+   border: 2px solid #73AD21;
+   padding: 20px;
+   width: 500px;
+   text-align: center;
+}
+
+.rcorner1 {
+   border-radius: 10px;
+   border: 2px solid orange;
+   width: 50px;
+   height: 50px;
+   text-align: center;
+}
+
+.try_now {
+   /*font-family: sans-serif;*/
+   border: 1px solid #fff;
+   font-size: 14px;
+   color: #fff;
+   padding: 10px;
+}
+
+.row{
+   /*border:1px solid #73AD21;*/
+   margin-bottom:5px;
+}
+.col{
+   /*border:1px solid #73AD21;*/
+}
+
+.btn{
+   font-weight:bold;
+   font-size:large;
+}
+.vert_cen{
+   margin-top: auto;
+   margin-bottom: auto;
+}
+.lbl_txt{
+   font-size:auto;
+   font-weight:bold;
+   border:1px;
+   padding:1px;
+   margin-top: auto;
+   margin-bottom: auto;
+}
+
+
