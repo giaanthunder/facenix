@@ -13,6 +13,8 @@ class losses():
    def g_loss(self, model_lst, inputs):
       Gen, Dis, Enc, Stu = model_lst
       x_real, a, b = inputs
+      b_diff = b - a
+      a_diff = a - a
 
       z_real     = Enc(x_real)
       z_fake_stu = Stu(z_real, b_diff)
@@ -33,6 +35,8 @@ class losses():
    def d_loss(self, model_lst, inputs):
       Gen, Dis, Enc, Stu = model_lst
       x_real, a, b = inputs
+      b_diff = b - a
+      a_diff = a - a
 
       z_real     = Enc(x_real)
       z_fake_stu = Stu(z_real, b_diff)

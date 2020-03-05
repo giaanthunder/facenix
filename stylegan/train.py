@@ -18,7 +18,7 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 # ==============================================================================
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--epoch', dest='epoch', type=int, default=10, help='# of epochs')
+parser.add_argument('--epoch', dest='epoch', type=int, default=20, help='# of epochs')
 parser.add_argument('--lr', dest='lr', type=float, default=0.002, help='learning rate')
 parser.add_argument('--gpu', dest='gpu', type=str, default='0', help='# of gpu computing in paralel')
 parser.add_argument('--experiment_name', dest='experiment_name',
