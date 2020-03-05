@@ -9,7 +9,7 @@
    - TensorFlow 2.1.0
    - OpenCV, Django, scikit learn,...
 
-   - *we recommend [Anaconda](https://www.anaconda.com/distribution/#download-section) or [Miniconda](https://docs.conda.io/en/latest/miniconda.html#linux-installers), then you can create the environment with commands below*
+   - *We recommend [Anaconda](https://www.anaconda.com/distribution/#download-section) or [Miniconda](https://docs.conda.io/en/latest/miniconda.html#linux-installers), then you can create the environment with commands below*
      ```console
      conda create -n tf2 python=3.6
      conda activate tf2
@@ -57,7 +57,8 @@
  
       - unzip the dataset
          ```console
-         unzip ./data/img_align_celeba.zip
+         cd data
+         unzip ./img_align_celeba.zip
          ```
 
    - StyleGAN dataset preparation: CelebA-HQ
@@ -66,7 +67,8 @@
  
       - unzip the dataset
          ```console
-         unzip ./data/CelebAMask-HQ.zip
+         cd data
+         unzip ./CelebAMask-HQ.zip
          ```
 
    - Train STGAN
