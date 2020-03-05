@@ -1,61 +1,111 @@
 # Facenix project
 > Facenix is a face attribute manipulating application. This app is deployed by using Django web framework with STGAN and StyleGAN models as backend.
 
-[![INSERT YOUR GRAPHIC HERE](x.png)]()
+<img src="./readme_img/ads.png" width="95%">
 
-## Preparation
-### Hardware (minimum)
-CPU: core i3
-RAM: 8GB
-SSD: 120GB
-GPU: Nvidia P106-100
-### Software
-OS      : Ubuntu 16.04 or above 
-CUDA    : 10.1
-Anaconda: 3
+## Usage
+- Environment
+   - Python 3.6
+   - TensorFlow 2.1.0
+   - OpenCV, Django, scikit learn,...
 
-Run folling command for creating python environment
-conda create -n facenix python=3.6
-conda activate facenix
-pip install --upgrade pip
+   - *we recommend [Anaconda](https://www.anaconda.com/distribution/#download-section) or [Miniconda](https://docs.conda.io/en/latest/miniconda.html#linux-installers), then you can create the environment with commands below*
+     ```console
+     conda create -n tf2 python=3.6
+     conda activate tf2
+     pip install --upgrade pip
+     pip install tensorflow==2.1.0
+     pip install tensorflow_addons
+     pip install django
+     pip install dlib
+     pip install opencv-python
+     pip install sklearn
+     pip install pillow
+     pip install requests matplotlib
+     
+     ```
+
+- Run web application
+   *All commands are run from facenix directory after "git clone"*
+   - Download pre-trained models
+      - pretrained_weights.zip (move to **facenix/pretrained_weights.zip**): [Google Drive](https://drive.google.com/open?id=197Y3FMQROjMPbDZUnRvySDNzGJjNtvyF)
+   - Unzip the models
+      ```console
+      unzip ./pretrained_weights.zip
+      ```
+   - Run web application
+      ```console
+      cd web_app
+      ./runserver.sh
+      ```
+   - Open web browser. Go to http://127.0.0.1:8000/. After the web page is loaded, you can try your own sample. If you would like to run web server on specific IP and port, you can pass it as arguments.
+      ```console
+      e.g.
+      ./runserver.sh 192.168.1.254:8888
+      ```
+
+- Re-training models
+   - Make sure to clean all previous training
+      ```console
+      ./clean_all.sh
+      ```
+
+   - STGAN dataset preparation: CelebA aligned
+      - download the dataset
+         - img_align_celeba_crop_128.zip (move to **facenix/data/img_align_celeba.zip**): [Google Drive](https://drive.google.com/open?id=1WUFjHg_7OCeQi74ldxfA4ixRvymK5d4Y)
+         - list_attr_celeba.txt (move to **facenix/data/list_attr_celeba.txt**): [Google Drive](https://drive.google.com/open?id=1t52Zm_9AyJ2oe4QDsLBOPVQ3rLRKWuZz)
  
-### Application materials
-Clone source
-git clone
-pip install -r requirements.txt
-Download pretrained models, extract it. Copy all content of Facenix_data to Facenix directory.
-   + Pretrained models
+      - unzip the dataset
+         ```console
+         unzip ./data/img_align_celeba.zip
+         ```
 
-## Testing application
-Please make sure you have done all preparation steps.
-cd <Facenix working dir>/web_app
-./runserver.sh
-Open web browser, go to <link>. You should see below GUI. Choose 1 between 2 methods and upload a photo. Face region will be cropped automatically.
-[![INSERT YOUR GRAPHIC HERE](x.png)]()
+   - StyleGAN dataset preparation: CelebA-HQ
+      - download the dataset
+         - CelebAMask-HQ.zip (move to **facenix/data/CelebAMask-HQ.zip**): [Google Drive](https://drive.google.com/file/d/0B7EVK8r0v71pZjFTYXZWM3FlRnM )
+ 
+      - unzip the dataset
+         ```console
+         unzip ./data/CelebAMask-HQ.zip
+         ```
 
-## Re-training models
-If you would like to re-train all models from scratch please follow steps below:
-- Download training data. Extract it.
-   + CelebA:
-   + CelebA-HQ: 
-- Change data location
-- Train STGAN:
-   + cd <Facenix working dir>/stgan
-   + python train.py
-- Train StyleGAN:
-   + cd <Facenix working dir>/classifier
-   + 
-   + cd <Facenix working dir>/boundary_finder
-   +
-   + cd <Facenix working dir>/stylegan
-   + python train.py
+   - Train STGAN
+      ```console
+      cd stgan
+      python train.py --experiment_name origin
+      ```
+
+   - Train StyleGAN
+      - Train generator      
+         ```console
+         cd stylegan
+         python train.py --experiment_name origin
+         ```
+
+      - Train classifier
+         ```console
+         cd classifier
+         ./train_all.sh
+         ```
+
+      - Train attribute vectors
+         ```console
+         cd boundary_finder
+         python data.py
+         python train.py
+         ```
+- Samples STGAN
+<img src="./readme_img/sample_stgan.png" width="95%">
+
+- Samples StyleGAN
+<img src="./readme_img/sample_stylegan.png" width="95%">
 
 ## Known issues
-- Attribute editing is not guarantee successful.
-- When editing with StyleGAN, the result can be different due to random initialization of encode vector
+- Attribute editing is not always successful.
+- When editing with StyleGAN, the same picture could be led to different results each time the image is uploaded.
 
-
-
-
+## Reference
+- [STGAN](https://arxiv.org/abs/1904.09709)
+- [StyleGAN](https://arxiv.org/abs/1812.04948)
 
 

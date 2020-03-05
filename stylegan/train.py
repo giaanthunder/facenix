@@ -18,7 +18,7 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 # ==============================================================================
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--epoch', dest='epoch', type=int, default=1, help='# of epochs')
+parser.add_argument('--epoch', dest='epoch', type=int, default=10, help='# of epochs')
 parser.add_argument('--lr', dest='lr', type=float, default=0.002, help='learning rate')
 parser.add_argument('--gpu', dest='gpu', type=str, default='0', help='# of gpu computing in paralel')
 parser.add_argument('--experiment_name', dest='experiment_name',
@@ -34,8 +34,7 @@ experiment_name = args.experiment_name
 # ==============================================================================
 CUR_DIR  = os.path.dirname(os.path.abspath(__file__))
 BASE_DIR = os.path.dirname(CUR_DIR)
-# DATA_DIR = BASE_DIR + '/data/'
-DATA_DIR = '/data2/01_luan_van/data/'
+DATA_DIR = BASE_DIR + '/data/'
 OUTPUT_DIR = CUR_DIR + '/output/%s/' % experiment_name
 SAMP_DIR = OUTPUT_DIR + '%s_sample' % (experiment_name)
 CKPT_DIR = OUTPUT_DIR + 'checkpoints'
@@ -77,8 +76,6 @@ params= tf.Variable(initial_value=[0, 0, 0], trainable=False, dtype=tf.int16)
 
 # model
 print("======= Create model_lst =======")
-# Gen = models.G_style(max_res=512)
-# Dis = models.D_basic(max_res=512)
 Gen = models.G_style()
 Dis = models.D_basic()
 
@@ -121,7 +118,7 @@ def g_step(model_lst, inputs):
    return loss
 
 
-train_phases = [ (8, 8), (16, 8), (32, 4), (64, 4), (128, 2), (256, 1), (512, 1)]#, (1024, 1) ]
+train_phases = [ (8, 8), (16, 8), (32, 4), (64, 4), (128, 2), (256, 1), (512, 1), (1024, 1) ]
 
 time_lst = []
 for cur_res, batch_size in train_phases:

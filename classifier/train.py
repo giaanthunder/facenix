@@ -4,15 +4,10 @@ import json
 import traceback
 
 import numpy as np
-import tensorflow as tf
-import data, models, loss, test
 
 import os, shutil, sys, math, time
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
-import logging
-logger = tf.get_logger()
-logger.setLevel(logging.ERROR)
 
 # ==============================================================================
 # =                                    param                                   =
@@ -22,7 +17,7 @@ parser = argparse.ArgumentParser()
 # model
 parser.add_argument('--img_size', dest='img_size', type=int, default=224)
 # training
-parser.add_argument('--epoch', dest='epoch', type=int, default=2, help='# of epochs')
+parser.add_argument('--epoch', dest='epoch', type=int, default=10, help='# of epochs')
 parser.add_argument('--batch_size', dest='batch_size', type=int, default=8)
 parser.add_argument('--lr', dest='lr', type=float, default=0.01, help='learning rate')
 parser.add_argument('--gpu', dest='gpu', type=str, default='0', help='# of gpu computing in paralel')
@@ -42,8 +37,6 @@ parser.add_argument('--att', dest='att', type=str, default='Male', help='''Choos
    'Wearing_Lipstick'   , 'Wearing_Necklace' , 'Wearing_Necktie',
    'Young'              
 ''')
-parser.add_argument('--name', dest='experiment_name',
-                    default=datetime.datetime.now().strftime('test_no_%y%m%d_%H%M%S'))
 
 args = parser.parse_args()
 # model
@@ -54,15 +47,20 @@ epochs = args.epoch
 batch_size = args.batch_size
 lr_base = args.lr
 att = args.att
-experiment_name = args.experiment_name + '_' + args.att
+experiment_name = args.att
 
 
 # ==============================================================================
 # =                                 init model                                 =
 # ==============================================================================
+CUR_DIR  = os.path.dirname(os.path.abspath(__file__))
+BASE_DIR = os.path.dirname(CUR_DIR)
+DATA_DIR = BASE_DIR + '/data/'
 # strategy
 print("======= Create strategy =======")
 os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu
+import tensorflow as tf
+import data, models, loss, test
 strategy = tf.distribute.MirroredStrategy()
 print('Number of GPUs in use:', strategy.num_replicas_in_sync)
 
@@ -90,7 +88,6 @@ with strategy.scope():
    y = Cls(x)
 
 # save progress
-CUR_DIR = os.path.dirname(os.path.abspath(__file__))
 checkpoint_dir = CUR_DIR + '/output/%s' % experiment_name
 checkpoint = tf.train.Checkpoint(
    params=params,
@@ -121,7 +118,6 @@ def step(model_lst, inputs):
          loss = losses.loss(model_lst, inputs)
          
       grad = tape.gradient(loss, w)
-      #print(grad)
       dw_w = zip(grad, w)
       opt.apply_gradients(dw_w)
       
@@ -129,7 +125,6 @@ def step(model_lst, inputs):
 
    loss = strategy.experimental_run_v2(single_step, args=(model_lst, inputs,))
    loss = strategy.reduce(tf.distribute.ReduceOp.SUM, loss, axis=None)
-   #print(loss.numpy())
    return loss
 
 
@@ -138,17 +133,14 @@ with strategy.scope():
    
    # data
    print("======= Make data: %dx%d ======="%(img_size, img_size))
-
-   data_dir = '/data2/01_luan_van/data/CelebAMask-HQ/'
-   #data_dir = '/data2/01_luan_van/data/'
    
-   tr_data = data.img_ds(data_dir=data_dir, 
+   tr_data = data.img_ds(data_dir=DATA_DIR+'/CelebAMask-HQ/', 
          att=att, img_resize=img_size, batch_size=g_batch_size, part='train')
    tr_ds  = strategy.experimental_distribute_dataset(tr_data.ds)
    tr_ite = iter(tr_ds)
 
 
-   val_data = data.img_ds(data_dir=data_dir, 
+   val_data = data.img_ds(data_dir=DATA_DIR+'/CelebAMask-HQ/', 
          att=att, img_resize=img_size, batch_size=g_batch_size, part='val')
    
    # loss, validation
@@ -158,8 +150,7 @@ with strategy.scope():
 
 # create tf graph
 print("======= Create graph =======")
-#graph = tf.function(step)
-graph = step
+graph = tf.function(step)
 
 # training loop
 print("======= Create training loop =======")

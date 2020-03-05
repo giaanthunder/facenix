@@ -759,11 +759,9 @@ def to_nchw(x):
    x = tf.transpose(x, [0, 3, 1, 2])
    return x
 
-def pretrained_models():
+def pretrained_models(experiment_name='origin'):
    Gen = G_style()
-   experiment_name = 'origin'
    checkpoint_dir = BASE_DIR+'/stylegan/output/%s/trained_model' % experiment_name
-   # checkpoint_dir = './output/%s/trained_model' % experiment_name
    checkpoint = tf.train.Checkpoint(
       Gen=Gen
    )

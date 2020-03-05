@@ -49,5 +49,5 @@ for i in "${strings[@]}"; do
    else
       gpu=0
    fi
-   python train.py --gpu $gpu --epoch 3 --att $i
+   python train.py --gpu $gpu --epoch 10 --att $i
 done

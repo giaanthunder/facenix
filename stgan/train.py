@@ -49,8 +49,7 @@ experiment_name = args.experiment_name
 # ==============================================================================
 CUR_DIR  = os.path.dirname(os.path.abspath(__file__))
 BASE_DIR = os.path.dirname(CUR_DIR)
-# DATA_DIR = BASE_DIR + '/data/'
-DATA_DIR = '/data2/01_luan_van/data/'
+DATA_DIR = BASE_DIR + '/data/'
 
 # save setting information
 output_dir = CUR_DIR + '/output/%s' % experiment_name
