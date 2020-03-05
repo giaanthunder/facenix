@@ -1,7 +1,7 @@
 # Facenix project
 > Facenix is a face attribute manipulating application. This app is deployed by using Django web framework with STGAN and StyleGAN models as backend.
 
-<img src="./readme_img/ads.png" width="95%">
+<img src="./readme_img/sample.png" width="95%">
 
 ## Usage
 - Environment
