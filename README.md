@@ -1,6 +1,7 @@
 # Facenix project
 > Facenix is a face attribute manipulating application. This app is deployed by using Django web framework with STGAN and StyleGAN models as backend.
 
+Video demonstration: [Youtube](https://youtu.be/H-bU4cEvkIA)
 <img src="./readme_img/sample.png" width="95%">
 
 ## Usage
@@ -63,7 +64,7 @@
 
    - StyleGAN dataset preparation: CelebA-HQ
       - download the dataset
-         - CelebAMask-HQ.zip (move to **facenix/data/CelebAMask-HQ.zip**): [Google Drive](https://drive.google.com/file/d/0B7EVK8r0v71pZjFTYXZWM3FlRnM )
+         - CelebAMask-HQ.zip (move to **facenix/data/CelebAMask-HQ.zip**): [Google Drive](https://drive.google.com/open?id=17qClHYuyPp4VgOrb1OjOAqLnDrkxTY2-)
  
       - unzip the dataset
          ```console
@@ -105,6 +106,7 @@
 ## Known issues
 - Attribute editing is not always successful.
 - When editing with StyleGAN, the same picture could be led to different results each time the image is uploaded.
+- The web server can serve 1 user each time due to high computing cost.
 
 ## Reference
 - [STGAN](https://arxiv.org/abs/1904.09709)
