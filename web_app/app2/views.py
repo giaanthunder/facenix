@@ -83,7 +83,7 @@ def app2(request):
          stylegui.set_res(cur_z_path, res_path)
 
       if cmd == 'download':
-         pass
+         return HttpResponse(settings.MEDIA_URL + request.COOKIES["uuid"] + "/result%d.jpg"%(i-2))
 
       return HttpResponse(res_url)
 

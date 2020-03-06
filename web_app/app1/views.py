@@ -3,7 +3,7 @@ from django.http import HttpResponse
 from django.core.files.storage import FileSystemStorage
 from django.conf import settings
 from .models import stgangui
-import os, shutil
+import os, shutil, mimetypes
 
 
 
@@ -81,7 +81,7 @@ def app1(request):
          stgangui.set_res(cur_zs_path, res_path)
 
       if cmd == 'download':
-         pass
+         return HttpResponse(settings.MEDIA_URL + request.COOKIES["uuid"] + "/result%d.jpg"%(i-2))
 
       return HttpResponse(res_url)
 

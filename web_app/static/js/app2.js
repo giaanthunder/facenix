@@ -162,14 +162,16 @@ function reset(){
 }
 
 function download(){
-   var res_img = document.getElementById("res_img");
-   let a = document.createElement('a');
-   a.href = window.location.hostname + res_img.src;
-   console.log(a.href);
-   a.download = true;
-   var event = document.createEvent('Event');
-   event.initEvent('click', true, true);
-   a.dispatchEvent(event);
+   var xhttp = new XMLHttpRequest();
+   var cmd = "?cmd=download"
+   xhttp.open("GET", cmd, true)
+   xhttp.send()
+   console.log('request sent')
+   xhttp.onreadystatechange = function() {
+      if (this.readyState == 4 && this.status == 200) {
+         download_file(this.responseText)
+      }
+   };
 }
 
 
