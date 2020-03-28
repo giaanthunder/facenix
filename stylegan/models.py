@@ -16,6 +16,97 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # ==============================================================================
 # =                                   Encoder                                  =
 # ==============================================================================
+class EncoderNN(keras.Model):
+   def __init__(self):
+      super(EncoderNN, self).__init__()
+      max_res      = 1024
+      max_lod      = int(math.log2(max_res)) - 2
+      self.lod     = max_lod
+      self.alpha   = tf.Variable(0.0, name='E/alpha', trainable=False)
+      nf           = [512, 512, 512, 512, 512, 256, 128, 64, 32, 16]
+      gain         = tf.sqrt(2.)
+      hi_res_lod   = 5
+
+      self.fromrgb_layers = []
+      for i in range(max_lod+1):
+         lay = from_rgb(nf, i)
+         self.fromrgb_layers.append(lay)
+
+      self.conv_layers = [e_primary_block(nf, 0, gain=gain)]
+      for i in range(1, hi_res_lod):
+         lay = d_low_res_block(nf, i, gain=gain)
+         self.conv_layers.append(lay)
+
+      for i in range(hi_res_lod, max_lod+1):
+         lay = d_hi_res_block(nf, i, gain=gain)
+         self.conv_layers.append(lay)
+
+
+   def call(self, img_in):
+      img = to_nchw(img_in)
+      x = self.fromrgb_layers[self.lod](img)
+
+      for i in range(self.lod, 0, -1):
+         x   = self.conv_layers[i](x)
+         img = downscale2d(img)
+         y = self.fromrgb_layers[i-1](img)
+         x   = lerf(x, y, self.alpha)
+      x = self.conv_layers[0](x)
+      return x
+
+class e_primary_block(layers.Layer):
+   def __init__(self, nf, i, gain):
+      super(e_primary_block, self).__init__()
+      
+      # channel_1    = nf[i+1]+1
+      channel_1    = nf[i+1]
+      channel_2    = nf[i]
+      res          = 2**(i+2)
+      self.res     = res
+      name         = 'E/%dx%d/'%(res, res)
+
+      self.conv    = conv2d(kernel=3, in_channel=channel_1, out_channel=channel_2, name=name+'Conv/', gain=gain)
+      init_conv_b  = tf.zeros(shape=[channel_2])
+      self.conv_b  = tf.Variable(init_conv_b, name=name+'Conv/bias', trainable=True)
+      self.flat    = layers.Flatten()
+
+      self.dense_0 = dense_block(res*res*channel_2, channel_2, act='none', name=name+'Dense_0/', gain=gain)
+      self.dense_1 = dense_block(channel_2, 512, act='none', name=name+'Dense_1/', gain=1.)
+
+      self.latent = []
+
+      for i in range(18):
+         w = dense_block(512, 512, act='none', name=name+'Latent_%02d/'%i, gain=1.)
+         self.latent.append(w)
+   
+   def call(self, x):
+      # y = minibatch_stddev(x)
+      # conv
+      y = self.conv(x)
+      y = y + tf.reshape(self.conv_b, shape=[1, -1, 1, 1])
+      y = tf.nn.leaky_relu(y)
+      y = self.flat(y)
+
+      # dense 0
+      y = self.dense_0(y)
+      y = tf.nn.leaky_relu(y)
+      # dense 1
+      y = self.dense_1(y)
+
+      ws = []
+      for i in range(18):
+         w_i = self.latent[i](y)
+         w_i = tf.expand_dims(w_i, axis=1)
+         ws.append(w_i)
+      w = tf.concat(ws, axis=1)
+
+
+      return w
+
+
+
+
+
 class Encoder(keras.Model):
    def __init__(self, Gen):
       super(Encoder, self).__init__()
