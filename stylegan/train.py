@@ -76,8 +76,31 @@ params= tf.Variable(initial_value=[0, 0, 0], trainable=False, dtype=tf.int16)
 
 # model
 print("======= Create model_lst =======")
-Gen = models.G_style()
-Dis = models.D_basic()
+# Gen = models.G_style()
+# Dis = models.D_basic()
+
+
+
+# ==== HACK ====
+Gen, Dis = models.pretrained_stylegan()
+
+w = Dis.trainable_variables
+d_vars = []
+for var in w:
+   if 'D/64x64/FromRGB' in var.name:
+      d_vars.append(var)
+
+w = Gen.trainable_variables
+g_vars = []
+for var in w:
+   if 'G_synthesis/64x64/ToRGB' in var.name:
+      g_vars.append(var)
+
+print(Gen.synthesis.alpha)
+print(Dis.alpha)
+# ==============
+
+
 
 def d_step(model_lst, inputs):
    def single_step(model_lst, inputs):
@@ -86,7 +109,8 @@ def d_step(model_lst, inputs):
       with tf.GradientTape() as d_tape:
          dis_loss = losses.d_loss(model_lst, inputs)
          
-      w    = Dis.trainable_variables
+      # w    = Dis.trainable_variables
+      w = d_vars
       grad = d_tape.gradient(dis_loss, w)
       dw_w = zip(grad, w)
       d_opt.apply_gradients(dw_w)
@@ -105,7 +129,8 @@ def g_step(model_lst, inputs):
       with tf.GradientTape() as g_tape:
          gen_loss = losses.g_loss(model_lst, inputs)
          
-      w    = Gen.trainable_variables
+      # w    = Gen.trainable_variables
+      w = g_vars
       grad = g_tape.gradient(gen_loss, w)
       dw_w = zip(grad, w)
       
@@ -118,7 +143,8 @@ def g_step(model_lst, inputs):
    return loss
 
 
-train_phases = [ (8, 8), (16, 8), (32, 4), (64, 4), (128, 2), (256, 1), (512, 1), (1024, 1) ]
+# train_phases = [ (8, 8), (16, 8), (32, 4), (64, 4), (128, 2), (256, 1), (512, 1), (1024, 1) ]
+train_phases = [ (64, 4) ]
 
 time_lst = []
 for cur_res, batch_size in train_phases:
@@ -199,7 +225,8 @@ try:
       Gen.synthesis.lod = int(math.log2(cur_res)) - 2
       Dis.lod = int(math.log2(cur_res)) - 2
 
-      update_alp = True
+      # update_alp = True
+      update_alp = False
 
       for ep in range(start_ep, epochs):
          for it in range(start_it, it_per_ep):
@@ -215,10 +242,7 @@ try:
 
                if it_phs_cnt > (it_per_phs//2):
                   Gen.synthesis.alpha.assign(0.)
-                  print(Dis.alpha.numpy())
                   Dis.alpha.assign(0.)
-                  print(Dis.alpha.numpy())
-                  input()
                   update_alp = False
 
 

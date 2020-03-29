@@ -895,10 +895,12 @@ def pretrained_stylegan():
       dst = d_vars[i][0]
       for var in vars:
          if var.name == dst:
-            tmp = np.load('./stylegan-encoder/d_vars/'+src)
+            tmp = np.load('./d_vars/'+src)
             tmp = tf.convert_to_tensor(tmp)
             var.assign(tmp)
             break
+   return Gen, Dis
+
    experiment_name = 'pretrained_stylegan'
    checkpoint_dir = './output/%s/trained_model' % experiment_name
    checkpoint = tf.train.Checkpoint(
