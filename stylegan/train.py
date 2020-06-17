@@ -77,7 +77,10 @@ params= tf.Variable(initial_value=[0, 0, 0], trainable=False, dtype=tf.int16)
 # model
 print("======= Create model_lst =======")
 Gen = models.G_style()
+Gen.is_training = True
 Dis = models.D_basic()
+
+
 
 def d_step(model_lst, inputs):
    def single_step(model_lst, inputs):
@@ -124,7 +127,7 @@ time_lst = []
 for cur_res, batch_size in train_phases:
    print(cur_res)
    g_batch_size = batch_size * strategy.num_replicas_in_sync
-   losses = loss.losses(g_batch_size, True) 
+   losses = loss.losses2(g_batch_size, True) 
    z = tf.ones([g_batch_size, 512])
    x = tf.ones([g_batch_size, cur_res, cur_res, 3])
    inputs = (z, x)

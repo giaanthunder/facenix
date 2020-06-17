@@ -61,11 +61,70 @@ def grad_pen(f, real, fake):
 
 
 
+class losses2():
+   def __init__(self, g_batch_size = 1, dist_train=False):
+      self.dist_train   = dist_train
+      self.g_batch_size = g_batch_size
 
+   def g_loss(self, model_lst, inputs):
+      Gen, Dis  = model_lst
+      z, x_real = inputs
 
+      x_fake = Gen(z)
+      d_fake = Dis(x_fake)
+      loss   = self.mean(tf.nn.softplus(-d_fake))
+      return loss
 
+   def d_loss(self, model_lst, inputs):
+      Gen, Dis  = model_lst
+      z, x_real = inputs
 
+      x_fake = Gen(z)
+      d_real = Dis(x_real)
+      d_fake = Dis(x_fake)
 
+      real_loss  = self.mean(tf.nn.softplus(-d_real))
+      fake_loss  = self.mean(tf.nn.softplus( d_fake))
+      r1_penalty = self.mean(r1_pen(Dis, x_real))
 
+      loss = real_loss + fake_loss + r1_penalty
+      return loss
+   
+   def mean(self, loss):
+      if self.dist_train:
+         return  tf.reduce_sum(loss) * (1. / self.g_batch_size)
+      else:
+         return tf.reduce_mean(loss)
 
+def r1_pen(Dis, x_real):
+   r1_gamma = 10.0
+   with tf.GradientTape() as t:
+      t.watch(x_real)
+      d_real = apply_loss_scaling(Dis(x_real))
+      r_loss = tf.reduce_sum(d_real)
+   r_grad = t.gradient(r_loss, x_real)
+   r_grad = undo_loss_scaling(r_grad)
+   r1_penalty = tf.reduce_sum(tf.square(r_grad), axis=[1,2,3])
+   r1_penalty = r1_penalty * (r1_gamma * 0.5)
+   return r1_penalty
+
+def r2_pen(Dis, x_fake):
+   r2_gamma = 0.0
+   with tf.GradientTape() as t:
+      t.watch(x_fake)
+      d_fake = apply_loss_scaling(Dis(x_fake))
+      f_loss = tf.reduce_sum(d_fake)
+   f_grad = t.gradient(f_loss, x_fake)
+   f_grad = undo_loss_scaling(f_grad)
+   r2_penalty = tf.reduce_sum(tf.square(f_grad), axis=[1,2,3])
+   r2_penalty = r2_penalty * (r2_gamma * 0.5)
+   return r2_penalty
+
+def apply_loss_scaling(x):
+   y = x * tf.exp(x * tf.log(2.))
+   return y
+
+def undo_loss_scaling(x):
+   y = x * tf.exp(-x * tf.log(2.))
+   return y
 
