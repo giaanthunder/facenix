@@ -7,10 +7,6 @@ logger = tf.get_logger()
 logger.disabled = True
 logger.setLevel(logging.FATAL)
 
-# phys_gpu = tf.config.experimental.list_physical_devices('GPU')[0]
-# vgpu1 = tf.config.experimental.VirtualDeviceConfiguration(memory_limit=2000)
-# vgpu2 = tf.config.experimental.VirtualDeviceConfiguration(memory_limit=2000)
-# tf.config.experimental.set_virtual_device_configuration(phys_gpu,[vgpu1,vgpu2])
 
 import numpy as np
 import cv2
@@ -113,25 +109,6 @@ def crop_align_face(img, lm):
     # Center of rect
     cx = int((x1+x2+x3+x4)/4 + 0.5)
     cy = int((y1+y2+y3+y4)/4 + 0.5)
-
-    # # draw
-    # cv2.line(img, (x1,y1), (x2,y2), color=(  91, 240, 58), thickness=2)
-    # cv2.line(img, (x2,y2), (x3,y3), color=(  91, 240, 58), thickness=2)
-    # cv2.line(img, (x3,y3), (x4,y4), color=(  91, 240, 58), thickness=2)
-    # cv2.line(img, (x4,y4), (x1,y1), color=(  91, 240, 58), thickness=2)
-    # cv2.circle(img, (x1,y1), radius=2, color=(0, 0, 0), thickness=2)
-    # cv2.circle(img, (x2,y2), radius=2, color=(255,0,0), thickness=2)
-    # cv2.circle(img, (x3,y3), radius=2, color=(0,255,0), thickness=2)
-    # cv2.circle(img, (x4,y4), radius=2, color=(0,0,255), thickness=2)
-    # cv2.circle(img, (cx,cy), radius=7, color=(255,0,0), thickness=5)
-    l_eye,r_eye,nose,l_mouth,r_mouth = lm
-    # cv2.circle(img, tuple(l_eye  ), radius=2, color=( 58,  70, 240), thickness=2)
-    # cv2.circle(img, tuple(r_eye  ), radius=2, color=( 58,  70, 240), thickness=2)
-    # cv2.circle(img, tuple(nose   ), radius=2, color=(255,   0,   0), thickness=2)
-    # cv2.circle(img, tuple(l_mouth), radius=2, color=(240, 234,  58), thickness=2)
-    # cv2.circle(img, tuple(r_mouth), radius=2, color=(240, 234,  58), thickness=2)
-    out_dir1 = '/data2/01_luan_van/30_face_changing_demo/facenix/web_app/'
-    # Image.fromarray(img).save(out_dir1+'pic2.jpg',quality=100)
 
     # Rotating angle
     a1, b1 = (x1-x2, y2-y1)
@@ -251,6 +228,7 @@ class FaceDetector():
 
 class FaceParser():
     def __init__(self):
+        import bisenet
         self.bnet = bisenet.models.pretrained_models()
         self.mask_dict = {
             'background': 0, 
@@ -259,13 +237,14 @@ class FaceParser():
             'l_lip': 13, 'neck'  : 14, 'neck_l': 15, 'cloth': 16, 'hair' : 17,  'hat'  : 18
         }
 
-    def parse(self, img, smooth=False, smooth_filter=0.1):
+    def parse(self, img, smooth=False, percent=10):
+        import bisenet
         img = tf.convert_to_tensor(img)
         img_in = bisenet.data.preprocess(img, size=512)
         img_in = tf.expand_dims(img_in, axis=0)
         out, out16, out32 = self.bnet(img_in)
         label = out[0].numpy()
-        masks = bisenet.data.to_mask2(img, label, smooth, smooth_filter)
+        masks = bisenet.data.to_mask2(img, label, smooth, percent)
         return masks
 
     def segment(self, img, masks, mask_names):
@@ -275,6 +254,10 @@ class FaceParser():
             mask += masks[name]
         seg_img = np.where(mask>0,img,black)
         return seg_img
+
+    def blur_edge(self, mask, percent=10):
+        import bisenet
+        return bisenet.data.blur_edge(mask,percent)
 
 def draw_box(image, box, color=(0,255,0),thickness=2):
     x, y ,w, h = box
@@ -305,7 +288,7 @@ def make_vid(in_video_path, out_video_path, model, start=0, duration=100000):
             break
 
         if cnt >= start and cnt < stop:
-            img = model.process_frame(frame)            
+            img = model.process_frame(frame)
             out_vid.write(img)
             # cv2.imshow('frame',img)
             # if cv2.waitKey(1) & 0xFF == ord('q'):

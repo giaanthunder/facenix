@@ -21,11 +21,11 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + '/'
 class Encoder(keras.Model):
     def __init__(self, Gen):
         super(Encoder, self).__init__()
-        vgg16             = keras.applications.vgg16.VGG16(weights='imagenet', include_top=False)
+        vgg16          = keras.applications.vgg16.VGG16(weights='imagenet', include_top=False)
         self.extractor = keras.Model(inputs=vgg16.input, outputs=vgg16.get_layer('block3_pool').output)
-        self.flat        = layers.Flatten()
-        self.Gen         = Gen
-        self.ar          = 0.3
+        self.flat      = layers.Flatten()
+        self.Gen       = Gen
+        self.ar        = 0.3
         
     def call(self, x_real, opt_ite=500, parser=None):
         masks = parser.parse(x_real[0],smooth=True, percent=5)

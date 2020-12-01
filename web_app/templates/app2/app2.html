@@ -21,7 +21,7 @@
         <p></p>
         <div class="row align-items-center justify-content-center">
             {% if ori_img_url %}
-                <img id="ori_img" src="{{ ori_img_url }}">
+                <img id="ori_img" src="{{ ori_img_url }}" style="max-height:500px; height:auto; width:auto;">
             {% else %}
                 <img id="ori_img" src="{% static 'images/facebook_thumb.jpg' %}" style="max-height:500px; height:auto; width:auto;">
             {% endif %}

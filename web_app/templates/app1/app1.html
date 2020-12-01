@@ -22,8 +22,8 @@
         <p></p>
         <div class="row align-items-center justify-content-center">
             {% if ori_vid_url %}
-                <video width="320" height="240" controls>
-                    <source id="out_vid" src="{{ ori_vid_url }}" type="video/webm">
+                <video id="out_vid" width="320" height="240" controls>
+                    <source id="out_src" src="{{ ori_vid_url }}" type="video/webm">
                 Your browser does not support the video tag.
                 </video>
             {% else %}

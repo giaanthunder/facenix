@@ -21,8 +21,13 @@ if root_dir not in sys.path:
 from facenix_utils import crop_align_face, rotate_img, FaceDetector, FaceParser, rand_name
 
 from att_vector_finder.vector_finder import get_att_vectors 
-import stylegan2 as stylegan
-name = 'stylegan2'
+
+name = 'stylegan'
+if name == 'stylegan':
+    import stylegan
+if name == 'stylegan2':
+    import stylegan2 as stylegan
+
 
 
 
@@ -66,7 +71,6 @@ class StyleGUI():
         frame = np.array(frame)
         h1,w1,_ = frame.shape
         # frame = cv2.resize(frame, (w1//3,h1//3))
-        out_dir1 = '/media/anhuynh/DATA/03_task/11_ads_face/05_retinaface_tf/31_integrate_stylegan2/web_app/'
         faces = self.detector.detect(frame)
 
         for i in range(len(faces)):
@@ -86,25 +90,12 @@ class StyleGUI():
             mod_face = stylegan.data.to_img(mod_face).numpy().astype(np.uint8)
             mod_face = cv2.resize(mod_face, (raw_w,raw_h))
 
-            masks = self.parser.parse(ali_face,smooth=True, smooth_filter=0.05)
+            masks = self.parser.parse(ali_face,smooth=True, percent=5)
             mask1 = masks['background'] + masks['neck'] + masks['neck_l'] + masks['cloth']
+            mask1 = self.parser.blur_edge(mask1)
             mask2 = np.ones(mask1.shape, dtype=np.float32) - mask1
             
             merge_face = ali_face * mask1 + mod_face * mask2
-
-            # m = np.tile(mask1,[1,1,3]).astype(np.uint8)*250
-            # Image.fromarray(m).save('mask1.jpg', quality=100)
-            # m = np.tile(mask2,[1,1,3]).astype(np.uint8)*250
-            # Image.fromarray(m).save('mask2.jpg', quality=100)
-
-            # face1 = (ali_face * mask1).astype(np.uint8)
-            # face2 = (mod_face * mask2).astype(np.uint8)
-            # merge = (ali_face * mask1 + mod_face * mask2).astype(np.uint8)
-            # Image.fromarray(face1).save(out_dir1+'face1.jpg',quality=100)
-            # Image.fromarray(face2).save(out_dir1+'face2.jpg',quality=100)
-            # Image.fromarray(mod_face).save(out_dir1+'mod_face.jpg',quality=100)
-            # Image.fromarray(ali_face).save(out_dir1+'ali_face.jpg',quality=100)
-            # Image.fromarray(merge).save(out_dir1+'merge.jpg',quality=100)
 
             # rap face, restore
             crp_x1, crp_y1, crp_x2, crp_y2 = crp_box
@@ -113,7 +104,6 @@ class StyleGUI():
             restore_img = rotate_img(img_rot, center, -angle)
             img_x1, img_y1, img_x2, img_y2 = img_box
             restore_img = restore_img[img_y1:img_y2,img_x1:img_x2]
-            print('DA XONG')
 
             path, name = rand_name(out_dir)
             path = path + '.jpg'
@@ -128,7 +118,6 @@ class StyleGUI():
         frame = Image.open(out_dir+"image.jpg").convert('RGB')
         frame = np.array(frame)
         faces = self.detector.detect(frame)
-        out_dir1 = '/data2/01_luan_van/30_face_changing_demo/facenix/web_app/'
 
         for i in range(len(faces)):
             bbox , landmarks = faces[i]
@@ -149,8 +138,9 @@ class StyleGUI():
             mod_face = stylegan.data.to_img(mod_face).numpy().astype(np.uint8)
             mod_face = cv2.resize(mod_face, (raw_w,raw_h))
 
-            masks = self.parser.parse(ali_face,smooth=True, smooth_filter=0.05)
+            masks = self.parser.parse(ali_face,smooth=True, percent=5)
             mask1 = masks['background'] + masks['neck'] + masks['neck_l'] + masks['cloth']
+            mask1 = self.parser.blur_edge(mask1)
             mask2 = np.ones(mask1.shape, dtype=np.float32) - mask1
 
             merge_face = ali_face * mask1 + mod_face * mask2
@@ -188,8 +178,9 @@ class StyleGUI():
             mod_face = stylegan.data.to_img(mod_face).numpy()
             mod_face = cv2.resize(mod_face, (raw_w,raw_h))
 
-            masks = self.parser.parse(ali_face,smooth=True, smooth_filter=0.05)
+            masks = self.parser.parse(ali_face,smooth=True, percent=5)
             mask1 = masks['background'] + masks['neck'] + masks['neck_l'] + masks['cloth']
+            mask1 = self.parser.blur_edge(mask1)
             mask2 = np.ones(mask1.shape, dtype=np.float32) - mask1
 
             merge_face = ali_face * mask1 + mod_face * mask2

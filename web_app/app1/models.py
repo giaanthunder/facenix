@@ -22,13 +22,6 @@ from facenix_utils import crop_align_face, rotate_img, FaceDetector, FaceParser,
 
 import stgan
 
-# ==============================================================================
-# =                                   STGAN                                    =
-# ==============================================================================
-
-
-
-
 
 class StganGUI():
     def __init__(self):
@@ -76,13 +69,9 @@ class StganGUI():
             def process_frame(self, frame):
                 print(self.cnt)
                 self.cnt += 1
-                # if self.cnt < 70:
-                #     return frame
                 frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-                h1,w1,_ = frame.shape
-                frame = cv2.resize(frame, (w1//3,h1//3))
-                out_dir1 = '/media/anhuynh/DATA/03_task/11_ads_face/05_retinaface_tf/31_integrate_stylegan2/web_app/'
-                # Image.fromarray(frame).save(out_dir1+'pic1.jpg',quality=100)
+                # h1,w1,_ = frame.shape
+                # frame = cv2.resize(frame, (w1//3,h1//3))
                 faces = self.detector.detect(frame)
 
                 for i in range(len(faces)):
@@ -98,12 +87,12 @@ class StganGUI():
                     mod_face = stgan.data.to_img(mod_face).numpy().astype(np.uint8)
                     mod_face = cv2.resize(mod_face, (raw_w,raw_h))
 
-                    masks = self.parser.parse(ali_face,smooth=True, smooth_filter=0.05)
+                    masks = self.parser.parse(ali_face,smooth=True, percent=5)
                     mask1 = masks['background'] + masks['neck'] + masks['neck_l'] + masks['cloth']
+                    mask1 = self.parser.blur_edge(mask1)
                     mask2 = np.ones(mask1.shape, dtype=np.float32) - mask1
 
                     merge_face = ali_face * mask1 + mod_face * mask2
-                    # merge_face = mod_face
 
                     # rap face, restore
                     crp_x1, crp_y1, crp_x2, crp_y2 = crp_box
@@ -112,8 +101,6 @@ class StganGUI():
                     restore_img = rotate_img(img_rot, center, -angle)
                     img_x1, img_y1, img_x2, img_y2 = img_box
                     restore_img = restore_img[img_y1:img_y2,img_x1:img_x2]
-                    # Image.fromarray(restore_img).save(out_dir1+'restore.jpg', quality=100)
-                    # exit()
 
                     restore_img = cv2.cvtColor(restore_img, cv2.COLOR_RGB2BGR)
                     return restore_img

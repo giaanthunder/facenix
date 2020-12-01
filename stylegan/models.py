@@ -19,19 +19,19 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 class Encoder(keras.Model):
     def __init__(self, Gen):
         super(Encoder, self).__init__()
-        vgg16             = keras.applications.vgg16.VGG16(weights='imagenet', include_top=False)
+        vgg16          = keras.applications.vgg16.VGG16(weights='imagenet', include_top=False)
         self.extractor = keras.Model(inputs=vgg16.input, outputs=vgg16.get_layer('block3_pool').output)
-        self.flat        = layers.Flatten()
-        self.Gen         = Gen
-        self.ar          = 0.3
+        self.flat      = layers.Flatten()
+        self.Gen       = Gen
+        self.ar        = 0.3
         
     def call(self, x_real, opt_ite=500, parser=None):
-        masks = parser.parse(x_real[0],smooth=True, smooth_filter=0.05)
+        masks = parser.parse(x_real[0],smooth=True, percent=5)
         mask  = masks['background'] + masks['neck'] + masks['neck_l'] + masks['cloth']
 
         masked = True
         if not masked:
-            mask  = np.zeros(mask.shape, dtype=np.float32)
+            mask = np.zeros(mask.shape, dtype=np.float32)
 
         mask1 = np.expand_dims(mask, axis=0)
         mask2 = np.ones(mask1.shape, dtype=np.float32) - mask1
@@ -58,16 +58,15 @@ class Encoder(keras.Model):
         loss_best = tf.argsort(loss)[:18]
         z_best = tf.gather(z_fake, loss_best)
         z_best = tf.reverse(z_best, axis=[0])
-
-        z_test = z_fake[loss_best[0]]
-        z_test = tf.reshape(z_test,[1,512])
-        z_test = tf.tile(z_test,[18,1])
-        z_best = z_test
-
         w_best = self.Gen.mapping(z_best, brc=False)
-        w_best = tf.Variable(w_best)
 
-
+        expand_space = False
+        if expand_space:
+            w_best = tf.Variable(w_best)
+        else:
+            w_best = w_best[-1]
+            w_best = tf.reshape(w_best,[1,512])
+            w_best = tf.Variable(w_best)
 
         count = 0
         min_loss = 1000000.
@@ -89,7 +88,7 @@ class Encoder(keras.Model):
         return min_w, min_loss
     
     def loss_calc(self, w, f_real, mask2):
-        w        = lerf(self.Gen.w_avg, w, self.ar)
+        w      = lerf(self.Gen.w_avg, w, self.ar)
         x_fake = (self.Gen.synthesis(w) + 1.)/2.
         x_fake = tf.image.resize(x_fake, [224, 224], tf.image.ResizeMethod.NEAREST_NEIGHBOR)
         x_fake = x_fake * mask2 #

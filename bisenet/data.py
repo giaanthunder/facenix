@@ -83,14 +83,14 @@ class MaskCeleba():
         if shuffle:
             ds = ds.shuffle(buffer_size=4096)
 
-        ds        = ds.repeat(-1)
-        ds        = ds.batch(batch_size, drop_remainder=drop_remainder)
+        ds = ds.repeat(-1)
+        ds = ds.batch(batch_size, drop_remainder=drop_remainder)
         self.ds = ds.prefetch(buffer_size=8)
 
     
 
 # ==============================================================================
-# =                                          Utilities                                              =
+# =                                Utilities                                   =
 # ==============================================================================
 @tf.function
 def ColorJitter(img, label):
@@ -182,12 +182,19 @@ def to_mask(img, label):
     masks = tf.stack(mask_lst, axis=2)
     return masks
 
-def to_mask2(img, label, smooth=False, f=0.05):
+def to_mask2(img, label, smooth=False, percent=5):
     mask_dict = {'background':  0, 
         'skin' :  1, 'l_brow':  2, 'r_brow':  3, 'l_eye':  4, 'r_eye':  5,  'eye_g':  6, 
         'l_ear':  7, 'r_ear' :  8, 'ear_r' :  9, 'nose' : 10, 'mouth': 11,  'u_lip': 12, 
         'l_lip': 13, 'neck'  : 14, 'neck_l': 15, 'cloth': 16, 'hair' : 17,  'hat'  : 18
     }
+    smooth_percent = {'background':  10, 
+        'skin' : 10, 'l_brow':  1, 'r_brow':  1, 'l_eye':  1, 'r_eye':  1,  'eye_g':  2, 
+        'l_ear':  1, 'r_ear' :  1, 'ear_r' :  1, 'nose' :  2, 'mouth':  2,  'u_lip':  1, 
+        'l_lip':  1, 'neck'  :  5, 'neck_l':  1, 'cloth':  2, 'hair' : 10,  'hat'  :  4
+    }
+
+
     h, w, c = img.shape
     
     label = np.argmax(label, axis=2)
@@ -196,20 +203,33 @@ def to_mask2(img, label, smooth=False, f=0.05):
         part = np.where(label==i, 1., 0.)
         part = part.astype(np.float32)
         part = cv2.resize(part, (w,h), cv2.INTER_NEAREST)
-        if smoothing:
-            part = smoothing(part, f=f)
         part = np.expand_dims(part, axis=2)
-        masks[name]=part
+        if smoothing:
+            percent = smooth_percent[name]
+            part = smoothing(part, percent=percent)
+        masks[name] = part
     return masks
 
-def smoothing(mask, f=0.05):
-    h, w = mask.shape
-    f_size = int(h*f)
+def smoothing(mask, percent=5):
+    mask = blur_edge(mask,percent)
+    mask = np.where(mask>0.5,1,0)
+    return mask
+
+def blur_edge(mask,percent=5):
+    n = len(mask.shape)
+    if n == 3:
+        h, w, _ = mask.shape
+    else:
+        h, w = mask.shape
+
+    mask = mask.astype(np.float32)
+    f_size = int(h*percent/100)
     if f_size%2 == 0:
         f_size+=1
-    smooth_mask = cv2.GaussianBlur(mask, (f_size, f_size), 0)
-    smooth_mask = np.where(smooth_mask>0.5,1,0)
-    return smooth_mask
+    mask = cv2.GaussianBlur(mask, (f_size, f_size), 0)
+    if n == 3:
+        mask = np.expand_dims(mask, axis=2)
+    return mask
 
 
 def colorize(img, label):

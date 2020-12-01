@@ -96,8 +96,10 @@ function apply(){
    xhttp.onreadystatechange = function() {
       if (this.readyState == 4 && this.status == 200) {
          var out_vid = document.getElementById("out_vid");
-         out_vid.src = this.responseText;
+         var out_src = document.getElementById("out_src");
+         out_src.src = this.responseText;
          console.log(this.responseText);
+         out_vid.load();
       }
    };
 }

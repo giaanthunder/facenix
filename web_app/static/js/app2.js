@@ -103,13 +103,12 @@ function make_att_row(att_name, att_lst) {
 }
 
 function add_att(){
-   console.log("an was here")
    var att_name = [
       'Attractive' , 'Bangs'     , 'Black Hair', 
       'Blond Hair' , 'Brown Hair', 'Eyeglasses', 
-      'Goatee'     , 'Gender'      , 'Mouth Open',
+      'Goatee'     , 'Gender'    , 'Mouth Open',
       'Narrow Eyes', 'Smiling'   , 'Age',
-      'Bald'       , 'Pose'      , ''
+      'Bald'       , ''      , ''
    ];
 
    var att_lst = [
@@ -117,7 +116,7 @@ function add_att(){
       'Blond_Hair' , 'Brown_Hair', 'Eyeglasses'         , 
       'Goatee'     , 'Male'      , 'Mouth_Slightly_Open',
       'Narrow_Eyes', 'Smiling'   , 'Young',
-      'Bald'       , 'Pose'      , ''
+      'Bald'       , ''      , ''
    ];
 
    for(var i=0; i<5; i++){
