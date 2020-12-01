@@ -2,128 +2,73 @@
 {% load static %}
 <html>
 <head>
-   <title>Facenix</title>
-   <meta charset="utf-8">
-   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-   <link rel="stylesheet" type="text/css" href="{% static 'css/mystyle.css' %}">
-   <link href="{% static 'images/flame-icon.png' %}" rel="shortcut icon" type="image/x-icon">
-   <script type="text/javascript" src="{% static 'js/common.js' %}"></script>
-   <script type="text/javascript" src="{% static 'js/app2.js' %}"></script>
+    <title>Facenix</title>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/mystyle.css' %}">
+    <link href="{% static 'images/flame-icon.png' %}" rel="shortcut icon" type="image/x-icon">
+    <script type="text/javascript" src="{% static 'js/common.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/app2.js' %}"></script>
 </head>
 <body>
-   <nav class="navbar navbar-dark" style="background: rgba(25, 25, 25, .6)">
-      <a class="navbar-brand rcorner1" href="/">
-         <img src="{% static 'images/facenix-icon.png' %}" height="30">
-      </a>
-   </nav>
+    <nav class="navbar navbar-dark" style="background: rgba(25, 25, 25, .6)">
+        <a class="navbar-brand rcorner1" href="/">
+            <img src="{% static 'images/facenix-icon.png' %}" height="30">
+        </a>
+    </nav>
 
-   <div class="container text-white">
-      <p></p>
-      <div class="row">
-         <!-- Show origin image and result -->
-         <div class="col col-md-4">
-            <div class="row">
-               <div>
-                  <h4>Origin:</h4>
-                  {% if ori_img_url %}
-                     <img id="ori_img" src="{{ ori_img_url }}" height="256">
-                  {% else %}
-                     <img id="ori_img" src="{% static 'images/facebook_thumb.jpg' %}" height="256">
-                  {% endif %}
-                  <p></p>
-               </div>
-            </div>
-            <div class="row">
-               <div>
-                  <h4>Result:</h4>
-                  {% if res_img_url %}
-                     <img id="res_img" src="{{ res_img_url }}" height="256">
-                  {% else %}
-                     <img id="res_img" src="{% static 'images/facebook_thumb.jpg' %}" height="256">
-                  {% endif %}
-               </div>
-            </div>
-         </div>
+    <div class="container text-white">
+        <p></p>
+        <div class="row align-items-center justify-content-center">
+            {% if ori_img_url %}
+                <img id="ori_img" src="{{ ori_img_url }}">
+            {% else %}
+                <img id="ori_img" src="{% static 'images/facebook_thumb.jpg' %}" style="max-height:500px; height:auto; width:auto;">
+            {% endif %}
+        </div>
 
-         <!-- Control panel -->
-         <div id="ctrl_panel" class="col col-md-8">
-            <div class="row"><label for="app2_ori">
-               <h5>1. Please upload your picture (then wait for 5 min):</h5></label>
-            </div>
-            <form method="post" enctype="multipart/form-data">
-               {% csrf_token %}
-               <div class="form-group">
-                  <div class="row">
-                  <div class="col col-md-8"  style="padding:1px">
-                     <input type="file" class="form-control-file" id="app2_ori" name="app2_ori" required>
-                  </div>
-                  <div class="col col-md-4"  style="padding:1px">
-                  <button type="submit" class="btn btn-light btn-block" onclick="up_btn()">Upload</button>
-                  </div>
-                  </div>
-               </div>
-            </form>
-
-
-<!--             <form method="post" enctype="multipart/form-data">
-               {% csrf_token %}
-               <div class="form-group">
-                  <div class="row">
-                     <div class="col col-md-4"  style="padding:1px">
-                        <h5>Or choose 1 samples:</h5>
-                     </div>
-                     <div class="col col-md-4"  style="padding:1px">
-                        <div class="form-group">
-                           <select class="form-control" id="sample">
-                              <option>Sample 1</option>
-                              <option>Sample 2</option>
-                              <option>Sample 3</option>
-                              <option>Sample 4</option>
-                              <option>Sample 5</option>
-                              <option>Sample 6</option>
-                              <option>Sample 7</option>
-                              <option>Sample 8</option>
-                              <option>Sample 9</option>
-                           </select>
+        
+        <div class="row align-items-center justify-content-center">
+            <!-- Control panel -->
+            <div id="ctrl_panel" class="col col-md-8">
+                <div class="row"><label for="app2_ori">
+                    <h5>1. Please upload your picture (then wait for 5 min):</h5></label>
+                </div>
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <div class="row">
+                        <div class="col col-md-8"  style="padding:1px">
+                            <input type="file" class="form-control-file" id="app2_ori" name="app2_ori" required>
                         </div>
-                     </div>
-                     <div class="col col-md-4"  style="padding:1px">
-                     <button type="button" class="btn btn-light btn-block" onclick="choose_sample()">Select</button>
-                     </div>
-                  </div>
-               </div>
-            </form> -->
+                        <div class="col col-md-4"  style="padding:1px">
+                        <button type="submit" class="btn btn-light btn-block" onclick="up_btn()">Upload</button>
+                        </div>
+                        </div>
+                    </div>
+                </form>
 
-            <div class="row">
-               <div class="col col-md-8" style="padding:1px">
-                  <h5>Or click this button for face generating:</h5>
-               </div>
-               <div class="col col-md-4" style="padding:1px">
-                  <button type="button" class="btn btn-light btn-block" onclick="rand_face()">Random face</button>
-               </div>
+                <p></p>
+                <div class="row"><h5>2. Please choose attribute to change:</h5></div>
+                <script type="text/javascript">add_att()</script>
+
+                <p></p>
+                <div class="row"><h5>3. Click Reset for undo changing:</h5></div>
+                <div class="row">
+                    <div class="col col-md-4" style="padding:1px">
+                        <button type="button" class="btn btn-danger btn-block" onclick="reset()">Reset</button>
+                    </div>
+                    <div class="col col-md-4" style="padding:1px">
+                        <button type="button" class="btn btn-primary btn-block" onclick="download()">Download</button>
+                    </div>
+                </div>
+
             </div>
 
-            <p></p>
-            <div class="row"><h5>2. Please choose attribute to change:</h5></div>
-            <script type="text/javascript">add_att()</script>
-
-            <p></p>
-            <div class="row"><h5>3. Click Reset for undo change:</h5></div>
-            <div class="row">
-               <div class="col col-md-4" style="padding:1px">
-                  <button type="button" class="btn btn-danger btn-block" onclick="reset()">Reset</button>
-               </div>
-               <div class="col col-md-4" style="padding:1px">
-                  <button type="button" class="btn btn-primary btn-block" onclick="download()">Download</button>
-               </div>
-            </div>
-
-         </div>
 
 
-
-      </div>
-   </div>
+        </div>
+    </div>
 
 </body>
 </html>

@@ -17,11 +17,11 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 parser = argparse.ArgumentParser()
 # model
 att_default = ['Bald', 'Bangs', 'Black_Hair', 'Blond_Hair', 'Brown_Hair', 'Bushy_Eyebrows', 'Eyeglasses', 'Male', 'Mouth_Slightly_Open', 'Mustache', 'No_Beard', 'Pale_Skin', 'Young']
-parser.add_argument('--atts', dest='atts', default=att_default, help='attributes to learn')
+parser.add_argument('--atts', dest='atts', default=att_default, choices=data.att_dict.keys(), nargs='+', help='attributes to learn')
 parser.add_argument('--img_size', dest='img_size', type=int, default=128)
 parser.add_argument('--z_dim', dest='z_dim', type=int, default=512)
 # training
-parser.add_argument('--epoch', dest='epoch', type=int, default=200, help='# of epochs')
+parser.add_argument('--epoch', dest='epoch', type=int, default=1, help='# of epochs')
 parser.add_argument('--batch_size', dest='batch_size', type=int, default=16)
 parser.add_argument('--lr', dest='lr', type=float, default=0.0002, help='learning rate')
 parser.add_argument('--n_d', dest='n_d', type=int, default=5, help='# of d updates per g update')
@@ -37,6 +37,7 @@ img_size = args.img_size
 z_dim = args.z_dim
 
 # training
+mode = args.mode
 epochs = args.epoch
 batch_size = args.batch_size
 lr_base = args.lr
@@ -48,7 +49,8 @@ experiment_name = args.experiment_name
 # ==============================================================================
 CUR_DIR  = os.path.dirname(os.path.abspath(__file__))
 BASE_DIR = os.path.dirname(CUR_DIR)
-DATA_DIR = BASE_DIR + '/data/'
+# DATA_DIR = BASE_DIR + '/data/'
+DATA_DIR = '/data2/01_luan_van/data/'
 
 # save setting information
 output_dir = CUR_DIR + '/output/%s' % experiment_name

@@ -9,83 +9,47 @@ import os, shutil
 
 # Create your views here.
 def app2(request):
-   #temp_dir = settings.MEDIA_ROOT + "/" + request.COOKIES["uuid"]
-   #print(request.COOKIES["uuid"])
-   if request.method == 'POST' and request.FILES['app2_ori']:
-      fs = FileSystemStorage() 
-      fs.save(request.COOKIES["uuid"] +"/origin.jpg", request.FILES['app2_ori'])
+    if request.method == 'POST' and request.FILES['app2_ori']:
+        dir_name = request.COOKIES["uuid"] + "/"
+        out_dir = settings.MEDIA_ROOT + "/" + dir_name
 
-      ori_name = request.COOKIES["uuid"] +"/origin.jpg"
-      ali_name = request.COOKIES["uuid"] +"/aligned.jpg"
-      res_name = request.COOKIES["uuid"] +"/result0.jpg"
+        if not os.path.exists(out_dir):
+            os.makedirs(out_dir)
+            
+        img_path = out_dir + "image.jpg"
 
-      ori_url  = settings.MEDIA_URL + ori_name
-      ali_url  = settings.MEDIA_URL + ali_name
-      res_url  = settings.MEDIA_URL + res_name
+        fs = FileSystemStorage() 
+        fs.save(img_path, request.FILES['app2_ori'])
 
-      ori_path = settings.MEDIA_ROOT + "/" + ori_name
-      ali_path = settings.MEDIA_ROOT + "/" + ali_name
-      res_path = settings.MEDIA_ROOT + "/" + res_name
+        f_name  = stylegui.find_z(out_dir, img_path)
+        img_url = settings.MEDIA_URL + dir_name + f_name
 
-      rs_z_path  = settings.MEDIA_ROOT + "/" + request.COOKIES["uuid"] +"/rs_z"
-      cur_z_path = settings.MEDIA_ROOT + "/" + request.COOKIES["uuid"] +"/cur_z"
+        mydict = {'ori_img_url': img_url}
+        return render(request, 'app2/app2.html', mydict)
 
-      os.mkdir(rs_z_path)
-      os.mkdir(cur_z_path)
+    
+    if request.method == 'GET' and request.GET:
+        dir_name = request.COOKIES["uuid"] + "/"
+        out_dir = settings.MEDIA_ROOT + "/" + dir_name
+        cmd  = request.GET['cmd']
 
-      stylegui.align_img(ori_path, ali_path)
-      stylegui.find_z(ali_path, rs_z_path, cur_z_path)
-      stylegui.set_res(cur_z_path, res_path)
-
-      mydict = {
-         'ori_img_url': ali_url,
-         'res_img_url': res_url
-      }
-      return render(request, 'app2/app2.html', mydict)
-
-   
-   if request.method == 'GET' and request.GET:
-      cmd  = request.GET['cmd']
-
-      ori_name = request.COOKIES["uuid"] +"/origin.jpg"
-      res_name = request.COOKIES["uuid"] +"/result0.jpg"
-
-      for i in range(1000):
-         if(os.path.exists(settings.MEDIA_ROOT + "/" + res_name)):
-            res_name = request.COOKIES["uuid"] + "/result%d.jpg"%(i)
-         else:
-            break
-
-      ori_url  = settings.MEDIA_URL + ori_name
-      res_url  = settings.MEDIA_URL + res_name
-
-      ori_path = settings.MEDIA_ROOT + "/" + ori_name
-      res_path = settings.MEDIA_ROOT + "/" + res_name
-
-      rs_z_path  = settings.MEDIA_ROOT + "/" + request.COOKIES["uuid"] +"/rs_z"
-      cur_z_path = settings.MEDIA_ROOT + "/" + request.COOKIES["uuid"] +"/cur_z"
-
-      if cmd == 'att_mod':
-         att_name = request.GET['att']
-         value = request.GET['value']
-         
-         stylegui.att_click(att_name, value, cur_z_path)
-         stylegui.set_res(cur_z_path, res_path)
+        if cmd == 'att_mod':
+            att_name = request.GET['att']
+            value = request.GET['value']
+            f_name = stylegui.att_mod(out_dir, att_name, value)
+            img_url = settings.MEDIA_URL + dir_name + f_name
+            return HttpResponse(img_url)
 
 
-      if cmd == 'reset':
-         shutil.rmtree(cur_z_path, ignore_errors=True)
-         shutil.copytree(rs_z_path, cur_z_path)
-         stylegui.set_res(cur_z_path, res_path)
+        if cmd == 'reset':
+            f_name = stylegui.reset(out_dir)
+            img_url = settings.MEDIA_URL + dir_name + f_name
+            return HttpResponse(img_url)
 
-      if cmd == 'rand_face':
-         stylegui.rand_face(cur_z_path, rs_z_path)
-         stylegui.set_res(cur_z_path, res_path)
+        if cmd == 'download':
+            return HttpResponse(settings.MEDIA_URL + dir_name + "/result%d.jpg"%(i-2))
 
-      if cmd == 'download':
-         return HttpResponse(settings.MEDIA_URL + request.COOKIES["uuid"] + "/result%d.jpg"%(i-2))
-
-      return HttpResponse(res_url)
+        return HttpResponse(res_url)
 
 
-   return render(request, 'app2/app2.html')
+    return render(request, 'app2/app2.html')

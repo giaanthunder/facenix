@@ -2,93 +2,82 @@
 {% load static %}
 <html>
 <head>
-   <title>Facenix</title>
-   <meta charset="utf-8">
-   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-   <link rel="stylesheet" type="text/css" href="{% static 'css/mystyle.css' %}">
-   <link href="{% static 'images/flame-icon.png' %}" rel="shortcut icon" type="image/x-icon">
-   <script type="text/javascript" src="{% static 'js/common.js' %}"></script>
-   <script type="text/javascript" src="{% static 'js/app1.js' %}"></script>
+    <title>Facenix</title>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/mystyle.css' %}">
+    <link href="{% static 'images/flame-icon.png' %}" rel="shortcut icon" type="image/x-icon">
+    <script type="text/javascript" src="{% static 'js/common.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/app1.js' %}"></script>
 </head>
 <body>
-   <nav class="navbar navbar-dark" style="background: rgba(25, 25, 25, .6)">
-      <a class="navbar-brand rcorner1" href="/">
-         <img src="{% static 'images/facenix-icon.png' %}" height="30">
-      </a>
-   </nav>
+    <nav class="navbar navbar-dark" style="background: rgba(25, 25, 25, .6)">
+        <a class="navbar-brand rcorner1" href="/">
+            <img src="{% static 'images/facenix-icon.png' %}" height="30">
+        </a>
+    </nav>
 
 
-   <div class="container text-white">
-      <p></p>
-      <div class="row">
-         <!-- Show origin image and result -->
-         <div class="col col-md-4">
-            <div class="row">
-               <div>
-                  <h4>Origin:</h4>
-                  {% if ori_img_url %}
-                     <img id="ori_img" src="{{ ori_img_url }}" height="256">
-                  {% else %}
-                     <img id="ori_img" src="{% static 'images/facebook_thumb.jpg' %}" height="256">
-                  {% endif %}
-                  <p></p>
-               </div>
-            </div>
-            <div class="row">
-               <div>
-                  <h4>Result:</h4>
-                  {% if res_img_url %}
-                     <img id="res_img" src="{{ res_img_url }}" height="256">
-                  {% else %}
-                     <img id="res_img" src="{% static 'images/facebook_thumb.jpg' %}" height="256">
-                  {% endif %}
-               </div>
-            </div>
-         </div>
-
-         <!-- Control panel -->
-         <div id="ctrl_panel" class="col col-md-8">
-
-            <form method="post" enctype="multipart/form-data">
-               {% csrf_token %}
-               <div class="form-group">
-                  <div class="row"><label for="app1_ori"><h5>1. Please upload your picture:</h5></label></div>
-                  <div class="row">
-                     <div class="col col-md-8"  style="padding:1px">
-                        <input type="file" class="form-control-file" id="app1_ori" name="app1_ori" required>
-                     </div>
-                     <div class="col col-md-4"  style="padding:1px">
-                     <button type="submit" class="btn btn-light btn-block" onclick="up_btn()">Upload</button>
-                     </div>
-                  </div>
-               </div>
-            </form>
-
-            <p></p>
-            <div class="row"><h5>2. Please choose attribute:</h5></div>
-            <script type="text/javascript">add_att()</script>
+    <div class="container text-white">
+        <p></p>
+        <div class="row align-items-center justify-content-center">
+            {% if ori_vid_url %}
+                <video width="320" height="240" controls>
+                    <source id="out_vid" src="{{ ori_vid_url }}" type="video/webm">
+                Your browser does not support the video tag.
+                </video>
+            {% else %}
+                <img id="ori_img" src="{% static 'images/facebook_thumb.jpg' %}" style="max-height:500px; height:auto; width:auto;">
+            {% endif %}
+        </div>
 
 
-            <p></p>
-            <div class="row"><h5>3. Click apply button for apply changes:</h5></div>
-            <div class="row">
-               <div class="col col-md-4" style="padding:1px">
-                  <button type="button" class="btn btn-primary btn-block" onclick="apply()">Apply</button>
-               </div>
-               <div class="col col-md-4" style="padding:1px">
-                  <button type="button" class="btn btn-danger btn-block" onclick="reset()">Reset</button>
-               </div>
-               <div class="col col-md-4" style="padding:1px">
-                  <button type="button" class="btn btn-light btn-block" onclick="download()">Download</button>
-               </div>
+
+        <div class="row align-items-center justify-content-center">
+
+            <!-- Control panel -->
+            <div id="ctrl_panel" class="col col-md-8">
+
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <div class="row"><label for="app1_ori"><h5>1. Please upload your video:</h5></label></div>
+                        <div class="row">
+                            <div class="col col-md-8"  style="padding:1px">
+                                <input type="file" class="form-control-file" id="app1_ori" name="app1_ori" required>
+                            </div>
+                            <div class="col col-md-4"  style="padding:1px">
+                                <button type="submit" class="btn btn-light btn-block" onclick="up_btn()">Upload</button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+
+                <p></p>
+                <div class="row"><h5>2. Please choose attribute:</h5></div>
+                <script type="text/javascript">add_att()</script>
+
+
+                <p></p>
+                <div class="row"><h5>3. Click apply button for apply changes:</h5></div>
+                <div class="row">
+                    <div class="col col-md-4" style="padding:1px">
+                        <button type="button" class="btn btn-primary btn-block" onclick="apply()">Apply</button>
+                    </div>
+                    <div class="col col-md-4" style="padding:1px">
+                        <button type="button" class="btn btn-danger btn-block" onclick="reset()">Reset</button>
+                    </div>
+                    <div class="col col-md-4" style="padding:1px">
+                        <button type="button" class="btn btn-light btn-block" onclick="download()">Download</button>
+                    </div>
+                </div>
+
             </div>
 
-         </div>
 
 
-
-      </div>
-   </div>
+        </div>
+    </div>
 
 </body>
 </html>

@@ -9,81 +9,47 @@ import os, shutil, mimetypes
 
 # Create your views here.
 def app1(request):
-   #temp_dir = settings.MEDIA_ROOT + "/" + request.COOKIES["uuid"]
-   #print(request.COOKIES["uuid"])
-   if request.method == 'POST' and request.FILES['app1_ori']:
-      print(type(request.FILES['app1_ori']))
-      fs = FileSystemStorage()
-      fs.save(request.COOKIES["uuid"] +"/origin.jpg", request.FILES['app1_ori'])
+    if request.method == 'POST' and request.FILES['app1_ori']:
+        dir_name = request.COOKIES["uuid"] + "/"
+        out_dir = settings.MEDIA_ROOT + "/" + dir_name
 
-      ori_name = request.COOKIES["uuid"] +"/origin.jpg"
-      ali_name = request.COOKIES["uuid"] +"/aligned.jpg"
-      res_name = request.COOKIES["uuid"] +"/result0.jpg"
+        if not os.path.exists(out_dir):
+            os.makedirs(out_dir)
 
-      ori_url  = settings.MEDIA_URL + ori_name
-      ali_url  = settings.MEDIA_URL + ali_name
-      res_url  = settings.MEDIA_URL + res_name
-      # ori_url  = ori_name
-      # res_url  = res_name
+        vid_path = out_dir + "video.mp4"
+        
+        fs = FileSystemStorage() 
+        fs.save(vid_path, request.FILES['app1_ori'])
 
-      ori_path = settings.MEDIA_ROOT + "/" + ori_name
-      ali_path = settings.MEDIA_ROOT + "/" + ali_name
-      res_path = settings.MEDIA_ROOT + "/" + res_name
+        f_name = stgangui.convert_plain(out_dir, vid_path)
+        vid_url = settings.MEDIA_URL + dir_name + f_name
+        
+        mydict = {'ori_vid_url': vid_url}
+        return render(request, 'app1/app1.html', mydict)
+    
+    if request.method == 'GET' and request.GET:
+        dir_name = request.COOKIES["uuid"] + "/"
+        out_dir = settings.MEDIA_ROOT + "/" + dir_name
+        cmd  = request.GET['cmd']
 
-      rs_zs_path  = settings.MEDIA_ROOT + "/" + request.COOKIES["uuid"] +"/rs_zs"
-      cur_zs_path = settings.MEDIA_ROOT + "/" + request.COOKIES["uuid"] +"/cur_zs"
+        if cmd == 'att_mod':
+            value = request.GET['value']
+            f_name = stgangui.att_mod(out_dir, value)
+            vid_url = settings.MEDIA_URL + dir_name + f_name
+            print(vid_url)
+            # mydict = {'ori_vid_url': vid_url}
+            # return render(request, 'app1/app1.html', mydict)
+            return HttpResponse(vid_url)
 
-      os.mkdir(rs_zs_path)
-      os.mkdir(cur_zs_path)
+        if cmd == 'reset':
+            f_name = stgangui.reset(out_dir)
+            vid_url = settings.MEDIA_URL + dir_name + f_name
+            return HttpResponse(vid_url)
 
-      stgangui.align_img(ori_path, ali_path)
-      stgangui.find_zs(ali_path, rs_zs_path, cur_zs_path)
-      stgangui.set_res(cur_zs_path, res_path)
+        if cmd == 'download':
+            return HttpResponse(settings.MEDIA_URL + dir_name + "/result%d.jpg"%(i-2))
 
-      mydict = {
-         'ori_img_url': ali_url,
-         'res_img_url': res_url
-      }
-      return render(request, 'app1/app1.html', mydict)
-
-   
-   if request.method == 'GET' and request.GET:
-      cmd  = request.GET['cmd']
-
-      ori_name = request.COOKIES["uuid"] +"/origin.jpg"
-      res_name = request.COOKIES["uuid"] +"/result0.jpg"
-
-      for i in range(1000):
-         if(os.path.exists(settings.MEDIA_ROOT + "/" + res_name)):
-            res_name = request.COOKIES["uuid"] + "/result%d.jpg"%(i)
-         else:
-            break
-
-      ori_url  = settings.MEDIA_URL  + ori_name
-      res_url  = settings.MEDIA_URL  + res_name
-      # ori_url  = ori_name
-      # res_url  = res_name
-
-      ori_path = settings.MEDIA_ROOT + "/" + ori_name
-      res_path = settings.MEDIA_ROOT + "/" + res_name
-
-      rs_zs_path  = settings.MEDIA_ROOT + "/" + request.COOKIES["uuid"] +"/rs_zs"
-      cur_zs_path = settings.MEDIA_ROOT + "/" + request.COOKIES["uuid"] +"/cur_zs"
-
-      if cmd == 'att_mod':
-         value = request.GET['value']
-         stgangui.att_click(value, cur_zs_path, res_path)
+        return HttpResponse(res_url)
 
 
-      if cmd == 'reset':
-         shutil.rmtree(cur_zs_path, ignore_errors=True)
-         shutil.copytree(rs_zs_path, cur_zs_path)
-         stgangui.set_res(cur_zs_path, res_path)
-
-      if cmd == 'download':
-         return HttpResponse(settings.MEDIA_URL + request.COOKIES["uuid"] + "/result%d.jpg"%(i-2))
-
-      return HttpResponse(res_url)
-
-
-   return render(request, 'app1/app1.html')
+    return render(request, 'app1/app1.html')

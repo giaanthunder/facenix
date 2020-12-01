@@ -98,12 +98,6 @@ def to_file(img, img_path):
 def to_img_file(x, img_path):
    img = to_img(x)
    to_file(img, img_path)
-
-
-import cv2, dlib
-def align_face(img, lm_path):
-   detector  = dlib.get_frontal_face_detector()
-   predictor = dlib.shape_predictor(lm_path)
    
    
 # set confilcting att from 1 to 0 

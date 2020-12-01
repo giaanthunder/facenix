@@ -95,8 +95,8 @@ function apply(){
    xhttp.send()
    xhttp.onreadystatechange = function() {
       if (this.readyState == 4 && this.status == 200) {
-         var res_img = document.getElementById("res_img");
-         res_img.src = this.responseText;
+         var out_vid = document.getElementById("out_vid");
+         out_vid.src = this.responseText;
          console.log(this.responseText);
       }
    };
@@ -110,8 +110,8 @@ function reset(){
    xhttp.send()
    xhttp.onreadystatechange = function() {
       if (this.readyState == 4 && this.status == 200) {
-         var res_img = document.getElementById("res_img");
-         res_img.src = this.responseText;
+         var out_vid = document.getElementById("out_vid");
+         out_vid.src = this.responseText;
          console.log(this.responseText);
 
          for(var i=0; i<13; i++){

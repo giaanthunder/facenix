@@ -139,8 +139,8 @@ function att_click(){
    xhttp.send()
    xhttp.onreadystatechange = function() {
       if (this.readyState == 4 && this.status == 200) {
-         var res_img = document.getElementById("res_img");
-         res_img.src = this.responseText;
+         var ori_img = document.getElementById("ori_img");
+         ori_img.src = this.responseText;
          // console.log(this.responseText);
       }
    };
@@ -154,8 +154,8 @@ function reset(){
    xhttp.send();
    xhttp.onreadystatechange = function() {
       if (this.readyState == 4 && this.status == 200) {
-         var res_img = document.getElementById("res_img");
-         res_img.src = this.responseText;
+         var ori_img = document.getElementById("ori_img");
+         ori_img.src = this.responseText;
          console.log(this.responseText);
       }
    };

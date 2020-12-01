@@ -73,6 +73,7 @@ class losses2():
       x_fake = Gen(z)
       d_fake = Dis(x_fake)
       loss   = self.mean(tf.nn.softplus(-d_fake))
+
       return loss
 
    def d_loss(self, model_lst, inputs):
@@ -88,6 +89,7 @@ class losses2():
       r1_penalty = self.mean(r1_pen(Dis, x_real))
 
       loss = real_loss + fake_loss + r1_penalty
+
       return loss
    
    def mean(self, loss):
@@ -101,6 +103,7 @@ def r1_pen(Dis, x_real):
    with tf.GradientTape() as t:
       t.watch(x_real)
       d_real = apply_loss_scaling(Dis(x_real))
+      d_real = Dis(x_real)
       r_loss = tf.reduce_sum(d_real)
    r_grad = t.gradient(r_loss, x_real)
    r_grad = undo_loss_scaling(r_grad)
@@ -121,10 +124,10 @@ def r2_pen(Dis, x_fake):
    return r2_penalty
 
 def apply_loss_scaling(x):
-   y = x * tf.exp(x * tf.log(2.))
+   y = x * tf.exp(x * tf.math.log(2.))
    return y
 
 def undo_loss_scaling(x):
-   y = x * tf.exp(-x * tf.log(2.))
+   y = x * tf.exp(-x * tf.math.log(2.))
    return y
 

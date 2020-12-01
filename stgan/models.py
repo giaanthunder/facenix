@@ -236,7 +236,7 @@ def concat(z, zs, a):
       feats.append(a)
    return tf.concat(feats, axis=3)
 
-def pretrained_models(experiment_name = 'origin'):
+def pretrained_models():
    Enc = Encoder()
    Gen = Generator()
    Stu = STU()
@@ -248,6 +248,8 @@ def pretrained_models(experiment_name = 'origin'):
    z_stu  = Stu(z, a)
    x_fake = Gen(z_stu, a)
 
+   
+   experiment_name = 'origin'
    checkpoint_dir = BASE_DIR+'/stgan/output/%s/trained_model' % experiment_name
    checkpoint = tf.train.Checkpoint(
       Enc=Enc, Gen=Gen, Stu=Stu
