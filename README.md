@@ -29,10 +29,10 @@ Video demonstration: [Youtube](https://youtu.be/H-bU4cEvkIA)
 - Run web application
    *All commands are run from facenix directory after "git clone"*
    - Download pre-trained models
-      - pretrained_weights.zip (move to **facenix/pretrained_weights.zip**): [Google Drive](https://drive.google.com/open?id=197Y3FMQROjMPbDZUnRvySDNzGJjNtvyF)
-   - Unzip the models
+      - weights.zip [Google Drive](https://drive.google.com/file/d/1mMTt8iNI4vNgEoLMbOqPPnEliV8TqgvC)
+   - Unzip and copy all folders into facenix/
       ```console
-      unzip ./pretrained_weights.zip
+      unzip weights.zip
       ```
    - Run web application
       ```console
@@ -88,14 +88,14 @@ Video demonstration: [Youtube](https://youtu.be/H-bU4cEvkIA)
       - Train classifier
          ```console
          cd classifier
-         ./train_all.sh
+         python train.py
          ```
 
       - Train attribute vectors
          ```console
-         cd boundary_finder
-         python data.py
-         python train.py
+         cd att_vector_finder
+         python sample_maker.py
+         python vector_finder.py
          ```
 - Samples STGAN
 <img src="./readme_img/sample_stgan.png" width="95%">
