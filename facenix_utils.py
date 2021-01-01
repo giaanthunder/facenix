@@ -271,15 +271,16 @@ def draw_text(image, text, pos=(20,20), fontScale=0.7, color=(240, 31, 31)):
 
 def make_vid(in_video_path, out_video_path, model, start=0, duration=100000):
     cap = cv2.VideoCapture(in_video_path)
+    fps = cap.get(cv2.CAP_PROP_FPS)
     frame_width  = int(cap.get(3))
     frame_height = int(cap.get(4))
     # fourcc  = cv2.VideoWriter_fourcc('M','J','P','G')
     # fourcc  = cv2.VideoWriter_fourcc(*'mp4v')
     fourcc  = cv2.VideoWriter_fourcc(*'vp80')
-    out_vid = cv2.VideoWriter(out_video_path, fourcc, 30, (frame_width,frame_height))
+    out_vid = cv2.VideoWriter(out_video_path, fourcc, fps, (frame_width,frame_height))
 
     cnt = 0
-    stop = start + (30*duration)
+    stop = start + (fps*duration)
 
     while(True):
         ret, frame = cap.read()
